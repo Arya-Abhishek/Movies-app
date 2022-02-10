@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 
 export default class Banner extends Component {
   render() {
-    let movie = movies.results[0]
+    let movie = movies.results[1]
     console.log(movie);
     return (
         <>
