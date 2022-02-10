@@ -1,30 +1,41 @@
-import {movies} from './getMovies';
 import React, { Component } from 'react'
+import axios from 'axios';
 
 export default class Movies extends Component {
     constructor() {
         super();
         this.state = {
             hover: '',
-            parr: [1]
+            parr: [1],
+            currPage: 1,
+            movies: []
         }
     }
 
+    async componentDidMount() {
+        // Runs first time, when component gets mounted after render runs
+        const res = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=add79b1ccf9f8adb1b3f67f75176da6f&language=en-US&page=${this.state.currPage}`)
+        const data = res.data.results
+        this.setState({
+            movies: [...data]
+        })
+        console.log('Mounting done!!')
+    }
+
   render() {
-    let movieList = movies.results
     return (
       <>
           {
-              movieList.length === 0 ? 
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+              this.state.movies.length === 0 ? 
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
                 </div> : 
                 <div>
                     <h3 className="text-center"><strong>Trending</strong></h3>
                     <div className='movies-list '>
                         {
-                            movieList.map(movieObj => (
-                                <div className="card movies-card" onMouseEnter={() => this.setState({hover: movieObj.id})} onMouseLeave={() => this.setState({hover: ''})}>
+                            this.state.movies.map(movieObj => (
+                                <div key={movieObj.id} className="card movies-card" onMouseEnter={() => this.setState({hover: movieObj.id})} onMouseLeave={() => this.setState({hover: ''})}>
                                     <img src={`https://image.tmdb.org/t/p/original/${movieObj.backdrop_path}`} alt={movieObj.title} className="card-img-top movies-img" alt="..." />
                                     {/* <div className="card-body"> */}
                                         <h1 className="card-title movies-title">{movieObj.original_title}</h1>
