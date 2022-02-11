@@ -2,17 +2,22 @@ import React, { Component } from 'react'
 import { movies } from './getMovies'
 
 export default class Favourite extends Component {
+
+    sortPopularityHigherFirst = () => {
+
+    }
+
     render() {
 
         let genreids = {
             28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
             27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi', 10770: 'TV', 53: 'Thriller', 10752: 'War', 37: 'Western'
         };
+        const moviesList = movies.results;
 
-        const moviesList = movies.results
+
         console.log(moviesList);
         return (
-
 
             <div>
                 <>
@@ -38,9 +43,17 @@ export default class Favourite extends Component {
                                             <tr>
                                                 <th scope="col">Title</th>
                                                 <th scope="col">Genre</th>
-                                                <th scope="col">Popularity</th>
-                                                <th scope="col">Rating</th>
-                                                <th scope="col">Action</th>
+                                                <th scope="col">
+                                                    <a onClick={this.sortPopularityHigherFirst}><i class="fa-solid fa-sort-up" /></a>
+                                                    Popularity
+                                                    <a onClick={this.sortPopularityLowerFirst}><i class="fa-solid fa-caret-down" /></a>
+                                                </th>
+                                                <th scope="col">
+                                                    <i class="fa-solid fa-sort-up"></i>
+                                                    Rating
+                                                    <i class="fa-solid fa-caret-down"></i>
+                                                </th>
+                                                <th scope="col"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -49,12 +62,14 @@ export default class Favourite extends Component {
                                                     <tr>
                                                         <th scope="row">
                                                             <img src={`https://image.tmdb.org/t/p/original/${movieObj.backdrop_path}`} alt="" className="table-row-image" />
-                                                            {movieObj.original_title
-                                                            }</th>
+                                                            {movieObj.original_title}
+                                                        </th>
                                                         <td>
                                                             {genreids[movieObj.genre_ids[0]]}
                                                         </td>
-                                                        <td>{movieObj.popularity}</td>
+                                                        <td>
+                                                            {movieObj.popularity}
+                                                        </td>
                                                         <td>{movieObj.vote_average}</td>
                                                         <td><button type="button" class="btn btn-danger">Delete</button></td>
                                                     </tr>
