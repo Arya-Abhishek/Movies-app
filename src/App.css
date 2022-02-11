@@ -58,6 +58,15 @@
 
 .favourite-genres {
     padding: 3rem;
+    padding-top: 0;
+}
+
+.table-row-image {
+    height: 5rem;
+}
+
+.main-favourite-cont {
+    margin-top: 4rem;
 }
 
 /* Media queries */
