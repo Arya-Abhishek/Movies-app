@@ -56,6 +56,10 @@
     height: 40vh;
 }
 
+.favourite-genres {
+    padding: 3rem;
+}
+
 /* Media queries */
 @media screen and (max-width: 400px) {
     .banner-card {
