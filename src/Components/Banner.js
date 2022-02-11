@@ -2,9 +2,10 @@ import { movies } from "./getMovies";
 import React, { Component } from 'react'
 
 export default class Banner extends Component {
+
   render() {
     let movie = movies.results[1]
-    console.log(movie);
+    // console.log(movie);
     return (
       <>
         {movie == '' ?
