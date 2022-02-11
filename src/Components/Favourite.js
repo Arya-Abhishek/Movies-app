@@ -2,21 +2,52 @@ import React, { Component } from 'react'
 import { movies } from './getMovies'
 
 export default class Favourite extends Component {
+    constructor() {
+        super();
+        this.state = {
+            genres: [],
+            currGen: 'All Genres'
+        }
+    }
 
     sortPopularityHigherFirst = () => {
 
     }
 
+    setGenreSelectedColor = (genre) => {
+        this.setState({
+            currGen: genre
+        })
+    }
+
     render() {
 
-        let genreids = {
+        let genreIds = {
             28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
             27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi', 10770: 'TV', 53: 'Thriller', 10752: 'War', 37: 'Western'
         };
         const moviesList = movies.results;
 
+        let tempGenres = []
+        // Fill all the genres of the current movies
+        moviesList.forEach(movieObj => {
+            let currentGenre = genreIds[movieObj.genre_ids[0]]
+            if (!tempGenres.includes(currentGenre)) {
+                tempGenres.push(currentGenre)
+            }
+        })
+
+        tempGenres.unshift('All Genres')
+
+        // Will Not work, maximum depth reached
+
+        // this.setState({
+        //     // have to do deep copy
+        //     genres: tempGenres
+        // })
 
         console.log(moviesList);
+
         return (
 
             <div>
@@ -24,34 +55,34 @@ export default class Favourite extends Component {
                     <div className="main-favourite-cont">
                         <div className='row'>
                             <div className='col-3 favourite-genres'>
-                                <ul class="list-group">
-                                    <li class="list-group-item">All Genres</li>
-                                    <li class="list-group-item">Action</li>
-                                    <li class="list-group-item">Thriller</li>
-                                    <li class="list-group-item">Fantasy</li>
-                                    <li class="list-group-item">Sci Fiction</li>
+                                <ul className="list-group">
+                                    {
+                                        tempGenres.map(genre => (
+                                            <li className={"list-group-item " + (this.state.currGen == genre ? 'active' : '')} onClick={() => this.setGenreSelectedColor(genre)} style={{ fontWeight: 'bold' }}>{genre}</li>
+                                        ))
+                                    }
                                 </ul>
                             </div>
                             <div className='col-9'>
                                 <div className="row">
                                     <input type="text" placeholder='Search Movie here' className='input-group-text col-6'></input>
-                                    <input type="number" placeholder='No of results want' className='input-group-text col-6'></input>
+                                    <input type="number" placeholder='Rows count' className='input-group-text col-6'></input>
                                 </div>
                                 <div className="row">
-                                    <table class="table">
+                                    <table className="table">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Title</th>
                                                 <th scope="col">Genre</th>
                                                 <th scope="col">
-                                                    <a onClick={this.sortPopularityHigherFirst}><i class="fa-solid fa-sort-up" /></a>
+                                                    <a onClick={this.sortPopularityHigherFirst}><i className="fa-solid fa-sort-up" /></a>
                                                     Popularity
-                                                    <a onClick={this.sortPopularityLowerFirst}><i class="fa-solid fa-caret-down" /></a>
+                                                    <a onClick={this.sortPopularityLowerFirst}><i className="fa-solid fa-caret-down" /></a>
                                                 </th>
                                                 <th scope="col">
-                                                    <i class="fa-solid fa-sort-up"></i>
+                                                    <i className="fa-solid fa-sort-up"></i>
                                                     Rating
-                                                    <i class="fa-solid fa-caret-down"></i>
+                                                    <i className="fa-solid fa-caret-down"></i>
                                                 </th>
                                                 <th scope="col"></th>
                                             </tr>
@@ -65,13 +96,13 @@ export default class Favourite extends Component {
                                                             {movieObj.original_title}
                                                         </th>
                                                         <td>
-                                                            {genreids[movieObj.genre_ids[0]]}
+                                                            {genreIds[movieObj.genre_ids[0]]}
                                                         </td>
                                                         <td>
                                                             {movieObj.popularity}
                                                         </td>
                                                         <td>{movieObj.vote_average}</td>
-                                                        <td><button type="button" class="btn btn-danger">Delete</button></td>
+                                                        <td><button type="button" className="btn btn-danger">Delete</button></td>
                                                     </tr>
                                                 ))
                                             }
@@ -80,12 +111,10 @@ export default class Favourite extends Component {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                                     <nav aria-label="Page navigation example">
-                                        <ul class="pagination">
-                                            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                        <ul className="pagination">
+                                            <li className="page-item"><a className="page-link" href="#">1</a></li>
+                                            <li className="page-item"><a className="page-link" href="#">2</a></li>
+                                            <li className="page-item"><a className="page-link" href="#">3</a></li>
                                         </ul>
                                     </nav>
                                 </div>
