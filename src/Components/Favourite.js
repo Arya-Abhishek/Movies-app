@@ -1,20 +1,95 @@
 import React, { Component } from 'react'
 import { movies } from './getMovies'
 
+let genreIds = {
+    28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
+    27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi', 10770: 'TV', 53: 'Thriller', 10752: 'War', 37: 'Western'
+};
+
 export default class Favourite extends Component {
     constructor() {
         super();
         this.state = {
             genres: [],
-            currGen: 'All Genres'
+            currGen: 'All Genres',
+            movies: [],
+            currText: ''
         }
     }
 
-    sortPopularityHigherFirst = () => {
+    componentDidMount() {
+        let dataArr = JSON.parse(localStorage.getItem("movies-app") || "[]")
+        let temp = []
 
+        // temp = dataArr.map(movie => genreIds[movie.genre_ids[0]])
+        dataArr.forEach(movie => {
+            let currentGenre = genreIds[movie.genre_ids[0]]
+            if (!temp.includes(currentGenre)) {
+                temp.push(currentGenre)
+            }
+        })
+        temp.unshift("All Genres")
+        this.setState({
+            genres: [...temp],
+            movies: [...dataArr]
+        })
     }
 
-    setGenreSelectedColor = (genre) => {
+    handleDeleteMovie = (id) => {
+        let moviesDataArr = [...this.state.movies]
+        let newMoviesDataArr = moviesDataArr.filter(movie => movie.id != id)
+        this.setState({
+            movies: [...newMoviesDataArr]
+        })
+    }
+
+    sortPopularityAscending = () => {
+        let currentMoviesArr = [...this.state.movies]
+        currentMoviesArr.sort((first, second) => {
+            return first.popularity - second.popularity;
+        })
+
+        this.setState({
+            movies: [...currentMoviesArr]
+        })
+    }
+
+    sortPopularityDescending = () => {
+        let currentMoviesArr = this.state.movies
+        currentMoviesArr.sort((first, second) => {
+            return (second.popularity - first.popularity);
+            // return (first.popularity - second.popularity) > 0;   Weird ??
+        })
+
+        this.setState({
+            movies: [...currentMoviesArr]
+        })
+    }
+
+    sortRatingAscending = () => {
+        let currentMoviesArr = [...this.state.movies]
+        currentMoviesArr.sort((first, second) => {
+            return first.vote_average - second.vote_average;
+        })
+
+        this.setState({
+            movies: [...currentMoviesArr]
+        })
+    }
+
+    sortRatingDescending = () => {
+        let currentMoviesArr = this.state.movies
+        currentMoviesArr.sort((first, second) => {
+            return (second.popularity - first.popularity);
+            // return (first.popularity - second.popularity) > 0;   Weird, Since this should have worked too ??
+        })
+
+        this.setState({
+            movies: [...currentMoviesArr]
+        })
+    }
+
+    setGenreSelected = (genre) => {
         this.setState({
             currGen: genre
         })
@@ -22,31 +97,26 @@ export default class Favourite extends Component {
 
     render() {
 
-        let genreIds = {
-            28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
-            27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi', 10770: 'TV', 53: 'Thriller', 10752: 'War', 37: 'Western'
-        };
-        const moviesList = movies.results;
-
-        let tempGenres = []
-        // Fill all the genres of the current movies
-        moviesList.forEach(movieObj => {
-            let currentGenre = genreIds[movieObj.genre_ids[0]]
-            if (!tempGenres.includes(currentGenre)) {
-                tempGenres.push(currentGenre)
-            }
-        })
-
-        tempGenres.unshift('All Genres')
-
-        // Will Not work, maximum depth reached
-
+        // Will Not work, maximum depth reached error -> when state gets updated setState will get called and when setState change
+        // the state then again render will be called and hence will get into an infinite loop
         // this.setState({
         //     // have to do deep copy
         //     genres: tempGenres
         // })
 
-        console.log(moviesList);
+        let filterArrMovies = []
+        if (this.state.currText == '') {
+            filterArrMovies = this.state.movies
+        } else {
+            filterArrMovies = this.state.movies.filter((movieObj) => {
+                let currentTitle = movieObj.original_title.toLowerCase();
+                return currentTitle.includes(this.state.currText.toLowerCase())
+            })
+        }
+
+        if (this.state.currGen != 'All Genres') {
+            filterArrMovies = this.state.movies.filter((movieObj) => genreIds[movieObj.genre_ids[0]] == this.state.currGen)
+        }
 
         return (
 
@@ -57,15 +127,15 @@ export default class Favourite extends Component {
                             <div className='col-3 favourite-genres'>
                                 <ul className="list-group">
                                     {
-                                        tempGenres.map(genre => (
-                                            <li className={"list-group-item " + (this.state.currGen == genre ? 'active' : '')} onClick={() => this.setGenreSelectedColor(genre)} style={{ fontWeight: 'bold' }}>{genre}</li>
+                                        this.state.genres.map(genre => (
+                                            <li className={"list-group-item " + (this.state.currGen == genre ? 'active' : '')} onClick={() => this.setGenreSelected(genre)} style={{ fontWeight: 'bold' }}>{genre}</li>
                                         ))
                                     }
                                 </ul>
                             </div>
                             <div className='col-9'>
                                 <div className="row">
-                                    <input type="text" placeholder='Search Movie here' className='input-group-text col-6'></input>
+                                    <input type="text" placeholder='Search Movie here' className='input-group-text col-6' value={this.state.currText} onChange={(e) => this.setState({ currText: e.target.value })}></input>
                                     <input type="number" placeholder='Rows count' className='input-group-text col-6'></input>
                                 </div>
                                 <div className="row">
@@ -75,21 +145,21 @@ export default class Favourite extends Component {
                                                 <th scope="col">Title</th>
                                                 <th scope="col">Genre</th>
                                                 <th scope="col">
-                                                    <a onClick={this.sortPopularityHigherFirst}><i className="fa-solid fa-sort-up" /></a>
+                                                    <i className="fa-solid fa-sort-up" onClick={this.sortPopularityDescending} />
                                                     Popularity
-                                                    <a onClick={this.sortPopularityLowerFirst}><i className="fa-solid fa-caret-down" /></a>
+                                                    <i className="fa-solid fa-caret-down" onClick={this.sortPopularityAscending} />
                                                 </th>
                                                 <th scope="col">
-                                                    <i className="fa-solid fa-sort-up"></i>
+                                                    <i className="fa-solid fa-sort-up" onClick={this.sortRatingDescending} />
                                                     Rating
-                                                    <i className="fa-solid fa-caret-down"></i>
+                                                    <i className="fa-solid fa-caret-down" onClick={this.sortRatingAscending} />
                                                 </th>
                                                 <th scope="col"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
-                                                moviesList.map((movieObj, currIdx) => (
+                                                filterArrMovies.map((movieObj) => (
                                                     <tr>
                                                         <th scope="row">
                                                             <img src={`https://image.tmdb.org/t/p/original/${movieObj.backdrop_path}`} alt="" className="table-row-image" />
@@ -102,7 +172,7 @@ export default class Favourite extends Component {
                                                             {movieObj.popularity}
                                                         </td>
                                                         <td>{movieObj.vote_average}</td>
-                                                        <td><button type="button" className="btn btn-danger">Delete</button></td>
+                                                        <td><button type="button" className="btn btn-danger" onClick={() => this.handleDeleteMovie(movieObj.id)}>Delete</button></td>
                                                     </tr>
                                                 ))
                                             }

@@ -54,7 +54,7 @@ export default class Movies extends Component {
     }
 
     handleFavouriteMovies = (movie) => {
-        let oldMoviesData = JSON.parse(localStorage.getItem('movie-app') || "[]")
+        let oldMoviesData = JSON.parse(localStorage.getItem('movies-app') || "[]")
         if (this.state.favourite.includes(movie.id)) {
             // If already exists, then second time is clicked for removal of the movie from favourites
             oldMoviesData = oldMoviesData.filter(m => m.id != movie.id)
@@ -62,13 +62,13 @@ export default class Movies extends Component {
             oldMoviesData.push(movie)
         }
 
-        localStorage.setItem('movie-app', JSON.stringify(oldMoviesData))
+        localStorage.setItem('movies-app', JSON.stringify(oldMoviesData))
         console.log(oldMoviesData);
         this.handleFavouriteMoviesState();
     }
 
     handleFavouriteMoviesState = () => {
-        let oldMoviesData = JSON.parse(localStorage.getItem('movie-app') || "[]")
+        let oldMoviesData = JSON.parse(localStorage.getItem('movies-app') || "[]")
         let tempArr = oldMoviesData.map(movie => movie.id)
         this.setState({
             favourite: [...tempArr]
