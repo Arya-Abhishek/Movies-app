@@ -13,7 +13,9 @@ export default class Favourite extends Component {
             genres: [],
             currGen: 'All Genres',
             movies: [],
-            currText: ''
+            currText: '',
+            limit: 5,
+            currPage: 1
         }
     }
 
@@ -36,11 +38,12 @@ export default class Favourite extends Component {
     }
 
     handleDeleteMovie = (id) => {
-        let moviesDataArr = [...this.state.movies]
+        let moviesDataArr = this.state.movies
         let newMoviesDataArr = moviesDataArr.filter(movie => movie.id != id)
         this.setState({
             movies: [...newMoviesDataArr]
         })
+        localStorage.set("movies-app", JSON.stringify(newMoviesDataArr))
     }
 
     sortPopularityAscending = () => {
@@ -95,6 +98,12 @@ export default class Favourite extends Component {
         })
     }
 
+    handlePageChange = (page) => {
+        this.setState({
+            currPage: page
+        })
+    }
+
     render() {
 
         // Will Not work, maximum depth reached error -> when state gets updated setState will get called and when setState change
@@ -118,13 +127,24 @@ export default class Favourite extends Component {
             filterArrMovies = this.state.movies.filter((movieObj) => genreIds[movieObj.genre_ids[0]] == this.state.currGen)
         }
 
+        let { limit, currPage } = this.state;
+        let pages = Math.ceil(filterArrMovies.length / this.state.limit);
+        let pagesArr = [];
+
+        for (let i = 1; i <= pages; i++) pagesArr.push(i);
+
+        let startIndex = (currPage - 1) * limit;
+        let endIndex = startIndex + limit;
+        console.log(startIndex, endIndex)
+        filterArrMovies = filterArrMovies.slice(startIndex, endIndex);
+
         return (
 
             <div>
                 <>
                     <div className="main-favourite-cont">
                         <div className='row'>
-                            <div className='col-3 favourite-genres'>
+                            <div className='col-lg-3 favourite-genres col-sm-12'>
                                 <ul className="list-group">
                                     {
                                         this.state.genres.map(genre => (
@@ -133,10 +153,10 @@ export default class Favourite extends Component {
                                     }
                                 </ul>
                             </div>
-                            <div className='col-9'>
+                            <div className='col-lg-9 col-sm-12' style={{ padding: '3rem', paddingTop: '0' }}>
                                 <div className="row">
                                     <input type="text" placeholder='Search Movie here' className='input-group-text col-6' value={this.state.currText} onChange={(e) => this.setState({ currText: e.target.value })}></input>
-                                    <input type="number" placeholder='Rows count' className='input-group-text col-6'></input>
+                                    <input type="number" placeholder='Rows count' className='input-group-text col-6' value={this.state.limit} onChange={(e) => this.setState({ limit: e.target.value })}></input>
                                 </div>
                                 <div className="row">
                                     <table className="table">
@@ -182,9 +202,11 @@ export default class Favourite extends Component {
                                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                                     <nav aria-label="Page navigation example">
                                         <ul className="pagination">
-                                            <li className="page-item"><a className="page-link" href="#">1</a></li>
-                                            <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                            <li className="page-item"><a className="page-link" href="#">3</a></li>
+                                            {
+                                                pagesArr.map(page => (
+                                                    <li className="page-item"><a className="page-link" onClick={() => this.handlePageChange(page)}>{page}</a></li>
+                                                ))
+                                            }
                                         </ul>
                                     </nav>
                                 </div>
